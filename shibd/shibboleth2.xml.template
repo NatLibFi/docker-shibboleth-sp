@@ -1,0 +1,34 @@
+<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
+    xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+    logger="console.logger"
+    clockSkew="180">
+    <TCPListener address="0.0.0.0" port="1600" acl="$SHIB_ACL"/>
+    <ApplicationDefaults entityID="$SHIB_APP_URL"
+                         REMOTE_USER="eppn" signing="true">
+        <Sessions lifetime="28800" timeout="3600" relayState="ss:mem"
+                  checkAddress="false" handlerSSL="true" cookieProps="https">
+            <SSO entityID="$SHIB_SSO_URL"> SAML2 </SSO>
+            <Logout>SAML2 Local</Logout>
+            <Handler type="Status" Location="/Status" acl="127.0.0.1 ::1"/>
+            <Handler type="Session" Location="/Session" showAttributeValues="false"/>
+        </Sessions>
+        <Errors supportContact="$SHIB_CONTACT_EMAIL"
+            helpLocation="/about.html"
+            styleSheet="/shibboleth-sp/main.css"/>
+        <Notify Channel="front" Location="$SHIB_LOGOUT_URL"/>
+        <MetadataProvider type="XML" uri="$SHIB_METADATA_URL"
+              backingFilePath="/etc/shibboleth/metadata/metadata.xml" reloadInterval="7200">
+            <!-- <MetadataFilter type="RequireValidUntil" maxValidityInterval="2419200"/> -->
+            <MetadataFilter type="Signature" certificate="sign.crt"/>
+        </MetadataProvider>
+        <AttributeExtractor type="XML" validate="true" reloadChanges="false" path="attribute-map.xml"/>
+        <AttributeResolver type="Query" subjectMatch="true"/>
+        <!--<AttributeFilter type="XML" validate="true" path="attribute-policy.xml"/>-->
+        <CredentialResolver type="File" key="sp-key.pem" certificate="sp-cert.pem"/>
+    </ApplicationDefaults>
+    <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
+    <ProtocolProvider type="XML" validate="true" reloadChanges="false" path="protocols.xml"/>
+</SPConfig>
