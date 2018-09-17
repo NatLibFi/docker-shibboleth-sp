@@ -5,3 +5,4 @@ sign.crt
 sp.crt
 sp.key
 vhost.conf
+shibboleth2.xml

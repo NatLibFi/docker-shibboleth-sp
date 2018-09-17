@@ -2,14 +2,14 @@
 set -e
 
 SHIB_ADDR=$(getent hosts $SHIB_HOST|cut -f1 -d' ')
+SELF_ADDR=$(getent hosts localhost|cut -f1 -d' ')
+LISTENER="<TCPListener address=\"$SHIB_ADDR\" port=\"$SHIB_PORT\" acl=\"$SELF_ADDR\" />"
 
-sed -e "s|\$SHIB_PORT|$SHIB_PORT|g" \
-    -e "s|\$SHIB_ADDR|$SHIB_ADDR|g" \
-    -e "s|\$SHIB_APP_URL|$SHIB_APP_URL|g" \
-    -e "s|\$SHIB_SSO_URL|$SHIB_SSO_URL|g" \
-    -e "s|\$SHIB_CONTACT_EMAIL|$SHIB_CONTACT_EMAIL|g" \
-    -e "s|\$SHIB_LOGOUT_URL|$SHIB_LOGOUT_URL|g" \
-    -e "s|\$SHIB_METADATA_URL|$SHIB_METADATA_URL|g" \
-    /app/shibboleth2.xml.template > /etc/shibboleth/shibboleth2.xml
+head -n -1 /etc/shibboleth/shibboleth2.xml.template > /etc/shibboleth/shibboleth2.xml
+echo '</SPConfig>' >> /etc/shibboleth/shibboleth2.xml
+
+sed -i "s|<ApplicationDefaults|$LISTENER\n&|g" /etc/shibboleth/shibboleth2.xml
+sed -i 's|<SPConfig|<SPConfig logger="console.logger"|g' /etc/shibboleth/shibboleth2.xml
+sed -i "s|\$SHIB_LOG_LEVEL|$SHIB_LOG_LEVEL|g" /etc/shibboleth/console.logger
 
 exec "$@"
