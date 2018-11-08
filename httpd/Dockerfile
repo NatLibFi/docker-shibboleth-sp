@@ -21,8 +21,7 @@ RUN apt-get update && apt-get upgrade -y \
   && ln -s /etc/apache2/mods-available/proxy.load /etc/apache2/mods-enabled/ \
   && ln -s /etc/apache2/mods-available/proxy_connect.load /etc/apache2/mods-enabled/ \
   && ln -s /etc/apache2/mods-available/proxy_http.load /etc/apache2/mods-enabled/ \
-  && rm /etc/apache2/sites-enabled/000-default.conf \
-    /etc/apache2/conf-enabled/other-vhosts-access-log.conf \
+  && rm /etc/apache2/sites-enabled/* /etc/apache2/conf-enabled/* \
   && apt-get clean \
   && rm -rf /build /tmp/* /var/cache/
 
